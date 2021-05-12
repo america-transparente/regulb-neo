@@ -1,0 +1,8 @@
+/bin/
+/node_modules/
+/.pulumi/
+/.vscode/
+Pulumi.*.yaml
+package-lock.json
+yarn.lock
+nuke/

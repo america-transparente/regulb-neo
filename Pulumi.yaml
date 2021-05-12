@@ -1,0 +1,3 @@
+name: regulb-neo
+runtime: nodejs
+description: Typesense-based backend for Reguleque.cl
