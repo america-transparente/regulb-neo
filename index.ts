@@ -1,5 +1,6 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as awsx from "@pulumi/awsx";
+import * as aws from "@pulumi/aws";
 
 const config = new pulumi.Config();
 
@@ -57,40 +58,51 @@ const cluster = new awsx.ecs.Cluster("reguleque-cl", {
 
 // Define the cluster task and service, building and publishing our "./app/Dockerfile" and connecting to the listener.
 const adminApiKey = config.require("adminApiKey");
-const typesenseTask = new awsx.ecs.FargateTaskDefinition("typesense-ta", {
-    containers: {
-        typesense: {
-            // Build the image from the Dockerfile
-            image: awsx.ecs.Image.fromPath("typesense", "./app"),
-            // Pass the administrator API key secret from the config
-            command: [`--api-key=${adminApiKey}`],
-            // Requirements
-            cpu: 2,
-            memory: 512,
-            // Connect with the load balancer listener
-            portMappings: [lbl],
-            // Mount a persistent volume for the typesense database
-            mountPoints: [
-                {
-                    sourceVolume: "typesense-storage",
-                    containerPath: "/data"
-                }
-            ]
-        },
-    },
-    // Create the volume needed for /data
-    // Note that sharing this between typesense instances has NOT been tested
-    // We're using a shared scope for ensuring persistence even if healing happens.
-    volumes: [
-        {
-            name: "typesense-storage",
-            dockerVolumeConfiguration: {
-                scope: "shared",
-                autoprovision: true,
-            }
-        }
-    ]
+// Create a EFS volume for persistence
+const filesystem = new aws.efs.FileSystem("typesense-fs");
+const ap = new aws.efs.AccessPoint("typesense-fs-as", {
+    fileSystemId: filesystem.id,
 })
+const typesenseTask = new awsx.ecs.FargateTaskDefinition
+    ("typesense-ta", {
+        containers: {
+            typesense: {
+                // Build the image from the Dockerfile
+                image: awsx.ecs.Image.fromPath("typesense", "./app"),
+                // This container is a requisite for the entire task
+                essential: true,
+                // Pass the administrator API key secret from the config
+                command: [`--api-key=${adminApiKey}`],
+                // Requirements
+                cpu: 2,
+                memory: 512,
+                // Connect with the load balancer listener
+                portMappings: [lbl],
+                // Mount a persistent volume for the typesense database
+                mountPoints: [
+                    {
+                        sourceVolume: "typesense-storage",
+                        containerPath: "/data"
+                    }
+                ]
+            },
+        },
+        // Create the volume needed for /data
+        // Note that sharing this between typesense instances has NOT been tested
+        volumes: [
+            {
+                name: "typesense-storage",
+                efsVolumeConfiguration: {
+                    fileSystemId: filesystem.id,
+                    transitEncryption: "ENABLED",
+                    authorizationConfig: {
+                        accessPointId: ap.id,
+                        iam: "ENABLED",
+                    },
+                }
+            }
+        ]
+    })
 // Create the service with only one instance in the cluster
 // Scaling has NOT been tested yet.
 const typesenseService = typesenseTask.createService("typesense-se", {

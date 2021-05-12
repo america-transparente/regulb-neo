@@ -1,6 +1,7 @@
 # syntax = docker/dockerfile:1.2
 FROM ubuntu:latest
 
+RUN mkdir -p /data
 VOLUME /data
 
 RUN apt-get update && apt-get install --no-install-recommends --yes curl ca-certificates
