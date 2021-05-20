@@ -33,3 +33,5 @@ jobs:
         secret_key: ${{ secrets.aws_secrey_key }}
         # the context path to use, defaults to root of the git repo
         context: app/
+        repo: typesense
+        
