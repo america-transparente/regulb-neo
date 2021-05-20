@@ -22,6 +22,7 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - uses: actions/checkout@v2
       - name: AWS ECR
       # You may pin to the exact commit or the version.
       # uses: kciter/aws-ecr-action@287991878740e91226f2177fdb85deb174fe0df3
