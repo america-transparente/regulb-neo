@@ -36,5 +36,5 @@ jobs:
         dockerfile: app/Dockerfile
         auto_tag: true
         repo: typesense
-        registry: ${{ secreys.ecr_registry }}
+        registry: ${{ secrets.ecr_registry }}
         
