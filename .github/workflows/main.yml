@@ -40,6 +40,7 @@ jobs:
           region: us-east-1 
           # Path to Dockerfile, defaults to the working directory
           path: app/
+          dockerfile: app/Dockerfile
 
 #     - name: Docker ECR
 #       # You may pin to the exact commit or the version.
