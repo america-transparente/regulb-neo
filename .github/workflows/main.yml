@@ -30,8 +30,11 @@ jobs:
         # amazon access key
         access_key: ${{ secrets.aws_access_key }}
         # amazon secret access key
-        secret_key: ${{ secrets.aws_secrey_key }}
+        secret_key: ${{ secrets.aws_secret_key }}
         # the context path to use, defaults to root of the git repo
         context: app/
+        dockerfile: app/Dockerfile
+        auto_tag: true
         repo: typesense
+        registry: ${{ secreys.ecr_registry }}
         
