@@ -4,8 +4,11 @@
         "@types/node": "^10.0.0"
     },
     "dependencies": {
+        "@babel/runtime": "^7.14.0",
         "@pulumi/aws": "^4.0.0",
         "@pulumi/awsx": "^0.30.0",
-        "@pulumi/pulumi": "^3.0.0"
+        "@pulumi/cloudflare": "^3.1.0",
+        "@pulumi/pulumi": "^3.0.0",
+        "typesense": "^0.12.1"
     }
 }
