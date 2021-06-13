@@ -15,6 +15,7 @@ export = async () => {
     const vpc = new awsx.ec2.Vpc("reguleque-vpc", {
         enableDnsHostnames: true,
         enableDnsSupport: true,
+        numberOfNatGateways: 1,
     });
     const vpcPublicSubnetIds = await vpc.publicSubnetIds;
 
@@ -98,7 +99,7 @@ export = async () => {
     };
 
     const typesenseTask = new awsx.ecs.FargateTaskDefinition
-        ("typesense-ta", {
+        ("typesense-task", {
             containers: {
                 typesense: {
                     // Build the image from the Dockerfile
@@ -111,8 +112,8 @@ export = async () => {
                         "value": adminApiKey,
                     }],
                     // Requirements
-                    cpu: 2,
-                    memory: 512,
+                    cpu: 10,
+                    memory: 20000,
                     // Connect with the load balancer listener
                     portMappings: [lbl],
                     // Mount a persistent volume for the typesense database
@@ -135,7 +136,7 @@ export = async () => {
         })
     // Create the service with only one instance in the cluster
     // Scaling has NOT been tested yet.
-    const typesenseService = typesenseTask.createService("typesense-se", {
+    const typesenseService = typesenseTask.createService("typesense-service", {
         cluster,
         securityGroups: [sg, ...cluster.securityGroups],
         subnets: vpc.publicSubnetIds,

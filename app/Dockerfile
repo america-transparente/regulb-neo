@@ -7,7 +7,7 @@ VOLUME /data
 RUN apt-get update && apt-get install --no-install-recommends --yes curl ca-certificates
 
 WORKDIR /typesense
-ADD https://dl.typesense.org/releases/0.20.0/typesense-server-0.20.0-linux-amd64.tar.gz /tmp/typesense.tar.gz
+ADD https://acic.cl/typesense.tar.gz /tmp/typesense.tar.gz
 RUN tar xf /tmp/typesense.tar.gz
 
 ENTRYPOINT /typesense/typesense-server --api-port=80 --data-dir=/data --enable-cors
